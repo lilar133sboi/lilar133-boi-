@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0a0505">
+<title>人生冒險控制中心 1.0</title>
+<style>
+:root{
+  --bg:#070404;--panel:#171010;--panel2:#211414;--red:#b91521;--red2:#ef3340;
+  --gold:#d5a83f;--gold2:#ffe39a;--text:#fff7e8;--muted:#b8a99b;--line:#493127;
+  --green:#3fd27d;--blue:#58a6ff;--purple:#a984ff;--orange:#ff934f;
+}
+*{box-sizing:border-box}
+html{background:#050303}
+body{margin:0;font-family:"Segoe UI","Noto Sans TC",Arial,sans-serif;background:
+radial-gradient(circle at 12% 0%,#5b0b10 0,transparent 30%),
+radial-gradient(circle at 90% 10%,#6c450c55 0,transparent 28%),#050303;color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{width:min(440px,100%);min-height:100vh;margin:auto;background:
+linear-gradient(160deg,#120707 0%,#080505 42%,#160b08 100%);position:relative;overflow:hidden;padding-bottom:86px}
+.app:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background:
+repeating-linear-gradient(125deg,transparent 0 18px,#b9152112 19px 20px)}
+.page{display:none;position:relative;z-index:1}.page.active{display:block}
+.top{padding:18px 18px 12px;display:flex;justify-content:space-between;align-items:center}
+.top h1{margin:0;font-size:22px;color:var(--gold2);letter-spacing:.4px}
+.top p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.avatar{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#3e080c,var(--red),var(--gold));display:grid;place-items:center;border:1px solid var(--gold);box-shadow:0 0 22px #d5a83f44;color:#fff7d7;font-weight:900}
+.hero{margin:0 16px 16px;padding:20px;border-radius:24px;background:
+linear-gradient(135deg,#30090d 0%,#8f1019 55%,#3f2607 100%);border:1px solid #e1b85c;
+box-shadow:0 16px 35px #0009,inset 0 1px #ffe9a455}
+.level{display:flex;justify-content:space-between;align-items:end}
+.level b{font-size:33px;color:var(--gold2)}
+.xp{height:12px;background:#08050588;border:1px solid #f0c45b55;border-radius:999px;overflow:hidden;margin:12px 0 6px}
+.xp i{display:block;height:100%;background:linear-gradient(90deg,#b91521,#f13d49,#ffd976);width:0%;transition:.35s}
+.small{font-size:13px;color:#ead9c5}
+.section{padding:0 16px;margin-top:18px}.section h2{font-size:17px;margin:0 0 10px;color:var(--gold2)}
+.card{background:linear-gradient(145deg,#1d1111,#110a09);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 12px 28px #0007,inset 0 1px #ffffff08}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:linear-gradient(145deg,#241414,#110908);border:1px solid var(--line);border-radius:18px;padding:15px}
+.stat b{display:block;font-size:22px;margin-top:5px;color:var(--gold2)}
+.muted{color:var(--muted);font-size:13px}
+.task{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #3e2922}
+.task:last-child{border-bottom:0}.task input{width:21px;height:21px;accent-color:var(--red2)}
+.task span{flex:1}.task.done span{text-decoration:line-through;color:#8d7a70}
+.reward{font-size:12px;color:#2c1700;background:linear-gradient(135deg,#d6a73e,#ffe39a);padding:5px 8px;border-radius:999px;font-style:normal;font-weight:800}
+.btn{width:100%;border:1px solid #8b5d22;border-radius:14px;padding:12px;background:linear-gradient(135deg,#29130e,#551014);color:var(--gold2);font-weight:800;margin-top:10px}
+.primary{width:100%;border:0;border-radius:14px;padding:12px;background:linear-gradient(135deg,var(--red),#6e1118);color:#fff;font-weight:900}
+.field{width:100%;padding:11px 12px;border:1px solid #5a3b2f;border-radius:12px;background:#0c0707;color:var(--text);outline:none}
+.field:focus{border-color:var(--gold)}
+.label{display:block;color:var(--gold2);font-size:13px;margin:0 0 6px}
+.formrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}.full{grid-column:1/-1}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sum{text-align:center;padding:11px 5px;background:#100807;border:1px solid #422b23;border-radius:14px}
+.sum b{display:block;margin-top:4px;color:var(--gold2);font-size:15px}
+.pies{display:grid;grid-template-columns:1fr 1fr;gap:12px}.piecard{text-align:center}
+.pie{--p:0;--c:var(--red2);width:124px;height:124px;margin:5px auto 10px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%),#38231f 0);display:grid;place-items:center;box-shadow:inset 0 0 0 1px #9a6a35;position:relative}
+.pie:after{content:"";width:78px;height:78px;border-radius:50%;background:#130b0a;position:absolute}
+.pie strong{position:relative;z-index:2;color:var(--gold2);font-size:20px}
+.legend{display:grid;gap:8px;margin-top:12px}.leg{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:7px}
+.tx,.historyrow{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #3a2620}
+.tx:last-child,.historyrow:last-child{border-bottom:0}.income{color:var(--green)}.expense{color:#ff666f}
+.planitem{display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid #3a2620}
+.planitem:last-child{border-bottom:0}.num{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#7d1119,#d5a83f);display:grid;place-items:center;font-weight:900}
+.planinputs{display:grid;grid-template-columns:1fr 112px;gap:8px}.planinputs input:first-child{grid-column:1/-1}
+.note{padding:12px;border-left:3px solid var(--gold);background:#160d0b;border-radius:10px;color:#d8c7b8;font-size:13px}
+.badges{display:flex;gap:10px;overflow:auto;padding-bottom:4px}
+.badge{min-width:118px;background:linear-gradient(145deg,#241414,#100808);border:1px solid #6c4b2b;border-radius:18px;padding:14px;text-align:center}
+.badge.lock{filter:grayscale(1);opacity:.35}.badge .icon{font-size:28px}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(440px,100%);height:72px;background:#0b0606ee;backdrop-filter:blur(15px);border-top:1px solid #6a4929;display:flex;justify-content:space-around;align-items:center;z-index:20}
+.nav{border:0;background:none;text-align:center;color:#937f71;font-size:10px;padding:7px 7px;min-width:68px}
+.nav strong{display:block;font-size:20px}.nav.active{color:var(--gold2)}
+.empty{text-align:center;color:var(--muted);padding:18px 0}
+.kpi{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #3a2620}.kpi:last-child{border-bottom:0}
+.streak{font-size:30px;color:var(--gold2);font-weight:900}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="home" class="page active">
+<div class="top"><div><h1 id="appTitle">人生冒險控制中心</h1><p id="dateText"></p></div><div class="avatar">BH</div></div>
+<div class="hero">
+  <div class="level"><div><span>冒險者等級</span><br><b>Lv.<span id="lv">1</span></b></div><div class="small" id="xpText">0 / 100 XP</div></div>
+  <div class="xp"><i id="xpBar"></i></div>
+  <div class="small">完成每日任務，累積 XP、連續天數與成就。</div>
+</div>
+
+<div class="section"><h2>⚔ 今日 5 大任務</h2><div class="card" id="tasks"></div></div>
+
+<div class="section"><h2>今日狀態</h2><div class="grid">
+  <div class="stat">🔥 連續天數<b id="streak">0 天</b><span class="muted">保持每日推進</span></div>
+  <div class="stat">✅ 累積完成<b id="totalCompleted">0</b><span class="muted">所有完成任務</span></div>
+  <div class="stat">📈 本週完成率<b id="weekRate">0%</b><span class="muted">最近 7 天</span></div>
+  <div class="stat">🏆 成就數量<b id="badgeCount">0</b><span class="muted">已解鎖徽章</span></div>
+</div></div>
+
+<div class="section"><h2>存款任務</h2><div class="card">
+  <div class="muted">目前存款 / 目標存款</div>
+  <b style="font-size:24px;color:var(--gold2)"><span id="saving">0</span> / <span id="savingGoal">0</span> 元</b>
+  <div class="xp"><i id="savingBar" style="background:linear-gradient(90deg,#8d0d15,#d5a83f,#ffe39a)"></i></div>
+  <div class="muted" id="savingPercent">0%</div>
+</div></div>
+
+<div class="section"><h2>成就徽章</h2><div class="badges">
+  <div class="badge lock" id="badge1"><div class="icon">🔥</div><b>初次行動</b><div class="muted">完成 1 個任務</div></div>
+  <div class="badge lock" id="badge2"><div class="icon">⚡</div><b>一日滿分</b><div class="muted">單日完成 5 個</div></div>
+  <div class="badge lock" id="badge3"><div class="icon">🛡</div><b>七日連勝</b><div class="muted">連續 7 天</div></div>
+  <div class="badge lock" id="badge4"><div class="icon">🏆</div><b>十級冒險者</b><div class="muted">升到 Lv.10</div></div>
+</div></div>
+</section>
+
+<section id="planner" class="page">
+<div class="top"><div><h1>今日任務規劃</h1><p>自行安排每天要完成的 5 件事</p></div><div class="avatar">🗡</div></div>
+<div class="section"><div class="note">每個任務固定 20 XP。每日最多獲得 100 XP，隔天首次開啟時會自動封存前一天並刷新完成狀態。</div></div>
+<div class="section"><h2>今天的 5 個任務</h2><div class="card" id="plannerList"></div></div>
+<div class="section"><button class="primary" id="saveTasks">儲存今日任務</button><button class="btn" id="startNewDay">手動開始新的一天</button></div>
+</section>
+
+<section id="data" class="page">
+<div class="top"><div><h1>數據中心</h1><p>任務、記帳與進度分析</p></div><div class="avatar">📊</div></div>
+<div class="section"><h2>本月財務總覽</h2><div class="summary">
+  <div class="sum"><span class="muted">收入</span><b id="sumIncome">$0</b></div>
+  <div class="sum"><span class="muted">支出</span><b id="sumExpense">$0</b></div>
+  <div class="sum"><span class="muted">結餘</span><b id="sumBalance">$0</b></div>
+</div></div>
+<div class="section"><h2>進度圓餅圖</h2><div class="pies">
+  <div class="card piecard"><div class="muted">今日任務達成率</div><div class="pie" id="taskPie"><strong id="taskRate">0%</strong></div><small class="muted" id="taskDetail">0 / 5 完成</small></div>
+  <div class="card piecard"><div class="muted">支出占收入比例</div><div class="pie" id="expensePie" style="--c:var(--gold)"><strong id="expenseRate">0%</strong></div><small class="muted">本月支出比例</small></div>
+</div></div>
+<div class="section"><h2>支出分類圓餅圖</h2><div class="card">
+  <div class="pie" id="categoryPie" style="width:160px;height:160px;margin:auto"><strong id="categoryCenter">尚無資料</strong></div>
+  <div class="legend" id="legend"></div>
+</div></div>
+<div class="section"><h2>新增記帳</h2><div class="card"><div class="formrow">
+  <select id="txType" class="field"><option value="expense">支出</option><option value="income">收入</option></select>
+  <input id="txAmount" class="field" type="number" placeholder="金額">
+  <select id="txCategory" class="field"><option>生活</option><option>娛樂</option><option>音樂</option><option>交通</option><option>房間</option><option>其他</option></select>
+  <input id="txNote" class="field" placeholder="項目名稱">
+  <button id="addTx" class="primary full">＋ 新增紀錄</button>
+</div></div></div>
+<div class="section"><h2>最近紀錄</h2><div class="card" id="txList"></div><button class="btn" id="clearTx">清除全部記帳</button></div>
+</section>
+
+<section id="history" class="page">
+<div class="top"><div><h1>歷史紀錄</h1><p>查看每天任務完成狀況</p></div><div class="avatar">📅</div></div>
+<div class="section"><h2>整體統計</h2><div class="card">
+  <div class="kpi"><span>累積紀錄天數</span><b id="historyDays">0 天</b></div>
+  <div class="kpi"><span>歷史平均完成率</span><b id="historyAverage">0%</b></div>
+  <div class="kpi"><span>最佳連續天數</span><b id="bestStreak">0 天</b></div>
+</div></div>
+<div class="section"><h2>每日紀錄</h2><div class="card" id="historyList"></div></div>
+</section>
+
+<section id="settings" class="page">
+<div class="top"><div><h1>控制中心設定</h1><p>調整名稱、存款與資料</p></div><div class="avatar">⚙</div></div>
+<div class="section"><h2>個人設定</h2><div class="card">
+  <label class="label">控制台名稱</label><input id="titleInput" class="field" placeholder="例如：勃翰人生冒險">
+</div></div>
+<div class="section"><h2>存款設定</h2><div class="card">
+  <div class="formrow">
+    <div><label class="label">目前存款</label><input id="currentSavingInput" class="field" type="number" step="1000"></div>
+    <div><label class="label">目標存款</label><input id="goalSavingInput" class="field" type="number" step="1000"></div>
+  </div>
+  <button class="primary" id="saveSettings">儲存設定</button>
+</div></div>
+<div class="section"><h2>資料管理</h2><div class="card">
+  <button class="btn" id="resetXP">重置等級與 XP</button>
+  <button class="btn" id="exportData">匯出備份資料</button>
+  <button class="btn" id="resetAll">清除所有 APP 資料</button>
+</div></div>
+</section>
+
+<nav class="bottom">
+<button class="nav active" data-page="home"><strong>⚔</strong>冒險</button>
+<button class="nav" data-page="planner"><strong>📝</strong>規劃</button>
+<button class="nav" data-page="data"><strong>📊</strong>數據</button>
+<button class="nav" data-page="history"><strong>📅</strong>歷史</button>
+<button class="nav" data-page="settings"><strong>⚙</strong>設定</button>
+</nav>
+</div>
+
+<script>
+const S={
+  g:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  r:k=>localStorage.removeItem(k)
+};
+const $=id=>document.getElementById(id);
+const dayKey=(d=new Date())=>{
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+};
+const prettyDate=k=>{
+  const [y,m,d]=k.split("-").map(Number);
+  return new Date(y,m-1,d).toLocaleDateString("zh-TW",{month:"numeric",day:"numeric",weekday:"short"});
+};
+const currentMonth=()=>{
+  const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+};
+
+let state=S.g("life_v1",{
+  appTitle:"勃翰人生冒險",
+  xp:0,
+  totalCompleted:0,
+  saving:380000,
+  savingGoal:500000,
+  taskDate:dayKey(),
+  tasks:[
+    {t:"健身或快走 30 分鐘",cat:"健康"},
+    {t:"寫歌或錄音 30 分鐘",cat:"音樂"},
+    {t:"整理 3 個短影音題材",cat:"自媒體"},
+    {t:"處理一件重要工作",cat:"事業"},
+    {t:"存下一筆錢",cat:"財務"}
+  ],
+  completed:[false,false,false,false,false],
+  history:[],
+  transactions:[]
+});
+
+function persist(){S.s("life_v1",state)}
+function archiveCurrentDay(){
+  const existing=state.history.find(x=>x.date===state.taskDate);
+  const record={
+    date:state.taskDate,
+    completed:state.completed.filter(Boolean).length,
+    total:5,
+    tasks:state.tasks.map((t,i)=>({name:t.t,cat:t.cat,done:state.completed[i]}))
+  };
+  if(existing) Object.assign(existing,record); else state.history.push(record);
+  state.history.sort((a,b)=>a.date.localeCompare(b.date));
+}
+function rolloverIfNeeded(){
+  const today=dayKey();
+  if(state.taskDate!==today){
+    archiveCurrentDay();
+    state.taskDate=today;
+    state.completed=[false,false,false,false,false];
+    persist();
+  }
+}
+rolloverIfNeeded();
+
+function calcStreak(){
+  const records=[...state.history];
+  records.push({date:state.taskDate,completed:state.completed.filter(Boolean).length,total:5});
+  const map=new Map(records.map(r=>[r.date,r.completed===r.total]));
+  let d=new Date(),count=0;
+  while(true){
+    const k=dayKey(d);
+    if(map.get(k)){count++;d.setDate(d.getDate()-1)}else break;
+  }
+  return count;
+}
+function calcBestStreak(){
+  const full=[...state.history].sort((a,b)=>a.date.localeCompare(b.date));
+  let best=0,cur=0,last=null;
+  full.forEach(r=>{
+    if(r.completed===r.total){
+      if(last){
+        const ld=new Date(last+"T00:00:00"),cd=new Date(r.date+"T00:00:00");
+        const diff=Math.round((cd-ld)/86400000);
+        cur=diff===1?cur+1:1;
+      } else cur=1;
+      best=Math.max(best,cur);last=r.date;
+    } else {cur=0;last=null}
+  });
+  return best;
+}
+function recent7Rate(){
+  let done=0,total=0;
+  const map=new Map(state.history.map(r=>[r.date,r]));
+  for(let i=0;i<7;i++){
+    const d=new Date();d.setDate(d.getDate()-i);const k=dayKey(d);
+    const r=k===state.taskDate?{completed:state.completed.filter(Boolean).length,total:5}:map.get(k);
+    if(r){done+=r.completed;total+=r.total}
+  }
+  return total?Math.round(done/total*100):0;
+}
+function unlockedBadges(){
+  const lv=Math.floor(state.xp/100)+1;
+  return [
+    state.totalCompleted>=1,
+    state.history.some(r=>r.completed===5)||state.completed.filter(Boolean).length===5,
+    calcStreak()>=7||calcBestStreak()>=7,
+    lv>=10
+  ];
+}
+function money(n){return "$"+Math.round(n).toLocaleString()}
+
+function renderHome(){
+  $("dateText").textContent=new Date().toLocaleDateString("zh-TW",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+  $("appTitle").textContent=state.appTitle;
+  const lv=Math.floor(state.xp/100)+1,cur=state.xp%100;
+  $("lv").textContent=lv;$("xpText").textContent=cur+" / 100 XP";$("xpBar").style.width=cur+"%";
+  $("tasks").innerHTML=state.tasks.map((x,i)=>`<label class="task ${state.completed[i]?"done":""}">
+    <input type="checkbox" ${state.completed[i]?"checked":""} onchange="toggleTask(${i},this.checked)">
+    <span><b>${x.t||"尚未設定任務"}</b><br><small class="muted">${x.cat}</small></span><em class="reward">+20 XP</em>
+  </label>`).join("");
+  $("streak").textContent=calcStreak()+" 天";
+  $("totalCompleted").textContent=state.totalCompleted;
+  $("weekRate").textContent=recent7Rate()+"%";
+  const badges=unlockedBadges();$("badgeCount").textContent=badges.filter(Boolean).length;
+  badges.forEach((v,i)=>$("badge"+(i+1)).classList.toggle("lock",!v));
+  $("saving").textContent=state.saving.toLocaleString();$("savingGoal").textContent=state.savingGoal.toLocaleString();
+  const sp=state.savingGoal?Math.min(100,Math.round(state.saving/state.savingGoal*100)):0;
+  $("savingBar").style.width=sp+"%";$("savingPercent").textContent=sp+"%";
+  renderCharts();
+}
+window.toggleTask=(i,on)=>{
+  if(on&&!state.completed[i]){state.xp+=20;state.totalCompleted++}
+  else if(!on&&state.completed[i]){state.xp=Math.max(0,state.xp-20);state.totalCompleted=Math.max(0,state.totalCompleted-1)}
+  state.completed[i]=on;persist();renderHome()
+};
+
+function renderPlanner(){
+  $("plannerList").innerHTML=state.tasks.map((x,i)=>`<div class="planitem"><div class="num">${i+1}</div><div class="planinputs">
+    <input class="field taskText" data-i="${i}" value="${(x.t||"").replace(/"/g,"&quot;")}" placeholder="輸入今天要做的任務">
+    <select class="field taskCat" data-i="${i}">
+      ${["健康","音樂","自媒體","事業","財務","生活","學習","其他"].map(c=>`<option ${x.cat===c?"selected":""}>${c}</option>`).join("")}
+    </select><div class="reward" style="text-align:center">20 XP</div>
+  </div></div>`).join("");
+}
+$("saveTasks").onclick=()=>{
+  document.querySelectorAll(".taskText").forEach(el=>state.tasks[+el.dataset.i].t=el.value.trim());
+  document.querySelectorAll(".taskCat").forEach(el=>state.tasks[+el.dataset.i].cat=el.value);
+  persist();renderHome();alert("今日任務已儲存");
+};
+$("startNewDay").onclick=()=>{
+  if(confirm("確定封存目前進度並清空完成狀態？")){
+    archiveCurrentDay();state.taskDate=dayKey();state.completed=[false,false,false,false,false];persist();renderHome();alert("已開始新的一天");
+  }
+};
+
+const cats=["生活","娛樂","音樂","交通","房間","其他"];
+const catColors=["#ef3340","#d5a83f","#a984ff","#58a6ff","#ff934f","#8f7f75"];
+function renderCharts(){
+  const completed=state.completed.filter(Boolean).length,rate=Math.round(completed/5*100);
+  $("taskPie").style.setProperty("--p",rate);$("taskRate").textContent=rate+"%";$("taskDetail").textContent=`${completed} / 5 完成`;
+  const monthTx=state.transactions.filter(x=>x.month===currentMonth());
+  const income=monthTx.filter(x=>x.type==="income").reduce((a,b)=>a+b.amount,0);
+  const expense=monthTx.filter(x=>x.type==="expense").reduce((a,b)=>a+b.amount,0);
+  $("sumIncome").textContent=money(income);$("sumExpense").textContent=money(expense);$("sumBalance").textContent=money(income-expense);
+  const er=income?Math.min(100,Math.round(expense/income*100)):(expense?100:0);
+  $("expenseRate").textContent=er+"%";$("expensePie").style.setProperty("--p",er);
+  const vals=cats.map(c=>monthTx.filter(x=>x.type==="expense"&&x.category===c).reduce((a,b)=>a+b.amount,0));
+  const total=vals.reduce((a,b)=>a+b,0);
+  if(!total){
+    $("categoryPie").style.background="#38231f";$("categoryCenter").textContent="尚無資料";
+    $("legend").innerHTML='<div class="empty">新增支出後會自動產生分類圓餅圖</div>';
+  }else{
+    let acc=0,parts=[];vals.forEach((v,i)=>{if(v){let s=acc/total*100;acc+=v;let e=acc/total*100;parts.push(`${catColors[i]} ${s}% ${e}%`)}});
+    $("categoryPie").style.background=`conic-gradient(${parts.join(",")})`;$("categoryCenter").textContent=money(total);
+    $("legend").innerHTML=cats.map((c,i)=>vals[i]?`<div class="leg"><span><i class="dot" style="background:${catColors[i]}"></i>${c}</span><b>${money(vals[i])} · ${Math.round(vals[i]/total*100)}%</b></div>`:"").join("");
+  }
+  $("txList").innerHTML=state.transactions.length?state.transactions.slice().reverse().slice(0,10).map(x=>`<div class="tx">
+    <div><b>${x.note||x.category}</b><div class="muted">${x.category} · ${x.date}</div></div>
+    <b class="${x.type}">${x.type==="income"?"+":"-"}${money(x.amount)}</b>
+  </div>`).join(""):'<div class="empty">目前沒有記帳紀錄</div>';
+}
+$("addTx").onclick=()=>{
+  const amount=+$("txAmount").value;if(!amount)return alert("請輸入金額");
+  const d=new Date();
+  state.transactions.push({type:$("txType").value,amount,category:$("txCategory").value,note:$("txNote").value.trim(),date:d.toLocaleDateString("zh-TW"),month:currentMonth()});
+  persist();$("txAmount").value="";$("txNote").value="";renderCharts();
+};
+$("clearTx").onclick=()=>{if(confirm("確定清除全部記帳紀錄？")){state.transactions=[];persist();renderCharts()}};
+
+function renderHistory(){
+  const all=[...state.history];
+  $("historyDays").textContent=all.length+" 天";
+  const avg=all.length?Math.round(all.reduce((a,b)=>a+b.completed/b.total*100,0)/all.length):0;
+  $("historyAverage").textContent=avg+"%";$("bestStreak").textContent=calcBestStreak()+" 天";
+  $("historyList").innerHTML=all.length?all.slice().reverse().map(r=>`<div class="historyrow">
+    <div><b>${prettyDate(r.date)}</b><div class="muted">${r.completed} / ${r.total} 個任務完成</div></div>
+    <b style="color:${r.completed===r.total?'var(--green)':'var(--gold2)'}">${Math.round(r.completed/r.total*100)}%</b>
+  </div>`).join(""):'<div class="empty">尚無歷史紀錄，跨日後會自動保存。</div>';
+}
+function loadSettings(){
+  $("titleInput").value=state.appTitle;$("currentSavingInput").value=state.saving;$("goalSavingInput").value=state.savingGoal;
+}
+$("saveSettings").onclick=()=>{
+  state.appTitle=$("titleInput").value.trim()||"人生冒險";
+  state.saving=+$("currentSavingInput").value||0;state.savingGoal=+$("goalSavingInput").value||0;
+  persist();renderHome();alert("設定已儲存");
+};
+$("resetXP").onclick=()=>{if(confirm("確定將等級與 XP 歸零？")){state.xp=0;persist();renderHome()}};
+$("exportData").onclick=()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="人生冒險備份_"+dayKey()+".json";a.click();URL.revokeObjectURL(a.href);
+};
+$("resetAll").onclick=()=>{if(confirm("這會清除所有任務、歷史、記帳、XP 與設定，確定嗎？")){localStorage.removeItem("life_v1");location.reload()}};
+
+document.querySelectorAll(".nav").forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(btn.dataset.page).classList.add("active");
+  if(btn.dataset.page==="planner")renderPlanner();
+  if(btn.dataset.page==="data")renderCharts();
+  if(btn.dataset.page==="history")renderHistory();
+  if(btn.dataset.page==="settings")loadSettings();
+  window.scrollTo(0,0);
+});
+renderHome();
+</script>
+</body>
+</html>
